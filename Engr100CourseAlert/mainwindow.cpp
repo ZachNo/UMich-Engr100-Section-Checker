@@ -187,12 +187,7 @@ void MainWindow::parsePage(bool ok)
         return;
     }
     else
-    {
         ui->Connection_Label->setText("Connection successful!");
-        /*logWindow += "Connection to ";
-        logWindow += url.toString();
-        logWindow += " successful\n";*/
-    }
 
     QString hyperText;
     if(view)
@@ -202,9 +197,7 @@ void MainWindow::parsePage(bool ok)
         {
             QWebFrame *webFramePtr = webPagePtr->mainFrame();
             if(webFramePtr)
-            {
                 hyperText = webFramePtr->toHtml();
-            }
         }
     }
     QTime time;
@@ -221,56 +214,23 @@ void MainWindow::parsePage(bool ok)
         {
             int open = hyperText.indexOf("Open", class1Index);
             int closed = hyperText.indexOf("Closed", class1Index);
-            if(open == -1 || closed == -1)
+            if((open == -1 || open > closed) && class1Open)
             {
-                if(open != -1)
-                {
-                    if(class1Open)
-                    {
-                        logWindow += "Class1 closed at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class1Open = false;
-                }
-                else
-                {
-                    if(!class1Open)
-                    {
-                        logWindow += "Class1 opened at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class1Open = true;
-                }
-            }
-            else if(open < closed)
-            {
-                if(!class1Open)
-                {
-                    logWindow += "Class1 opened at ";
-                    logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                    logWindow += ".\n";
-                }
-                class1Open = true;
-            }
-            else
-            {
-                if(class1Open)
-                {
-                    logWindow += "Class1 closed at ";
-                    logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                    logWindow += ".\n";
-                }
+                logWindow += "Class1 closed at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
                 class1Open = false;
+            }
+            else if((closed == -1 || open < closed) && !class1Open)
+            {
+                logWindow += "Class1 opened at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class1Open = true;
             }
         }
     }
@@ -278,332 +238,167 @@ void MainWindow::parsePage(bool ok)
     {
         int class2Index = hyperText.indexOf(ui->ClassEdit_2->text());
         if(class2Index == -1)
+        {
+            ui->ClassEdit_2->setText("Class not found");
+            logWindow += "Class 2 not found on page.\n";
+            class2OK = 0;
+        }
+        else
+        {
+            int open = hyperText.indexOf("Open", class2Index);
+            int closed = hyperText.indexOf("Closed", class2Index);
+            if((open == -1 || open > closed) && class2Open)
             {
-                ui->ClassEdit_2->setText("Class not found");
-                logWindow += "Class 2 not found on page.\n";
-                class2OK = 0;
+                logWindow += "Class2 closed at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class2Open = false;
             }
-            else
+            else if((closed == -1 || open < closed) && !class2Open)
             {
-                int open = hyperText.indexOf("Open", class2Index);
-                int closed = hyperText.indexOf("Closed", class2Index);
-                if(open == -1 || closed == -1)
-                {
-                    if(open != -1)
-                    {
-                        if(class2Open)
-                        {
-                            logWindow += "class2 closed at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class2Open = false;
-                    }
-                    else
-                    {
-                        if(!class2Open)
-                        {
-                            logWindow += "class2 opened at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class2Open = true;
-                    }
-                }
-                else if(open < closed)
-                {
-                    if(!class2Open)
-                    {
-                        logWindow += "class2 opened at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class2Open = true;
-                }
-                else
-                {
-                    if(class2Open)
-                    {
-                        logWindow += "class2 closed at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class2Open = false;
-                }
+                logWindow += "Class2 opened at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class2Open = true;
             }
         }
+    }
     if(class3OK)
+    {
+        int class3Index = hyperText.indexOf(ui->ClassEdit_3->text());
+        if(class3Index == -1)
         {
-            int class3Index = hyperText.indexOf(ui->ClassEdit_3->text());
-            if(class3Index == -1)
+            ui->ClassEdit_3->setText("Class not found");
+            logWindow += "Class 3 not found on page.\n";
+            class3OK = 0;
+        }
+        else
+        {
+            int open = hyperText.indexOf("Open", class3Index);
+            int closed = hyperText.indexOf("Closed", class3Index);
+            if((open == -1 || open > closed) && class3Open)
             {
-                ui->ClassEdit_3->setText("Class not found");
-                logWindow += "Class 3 not found on page.\n";
-                class3OK = 0;
+                logWindow += "Class3 closed at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class3Open = false;
             }
-            else
+            else if((closed == -1 || open < closed) && !class3Open)
             {
-                int open = hyperText.indexOf("Open", class3Index);
-                int closed = hyperText.indexOf("Closed", class3Index);
-                if(open == -1 || closed == -1)
-                {
-                    if(open != -1)
-                    {
-                        if(class3Open)
-                        {
-                            logWindow += "class3 closed at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class3Open = false;
-                    }
-                    else
-                    {
-                        if(!class3Open)
-                        {
-                            logWindow += "class3 opened at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class3Open = true;
-                    }
-                }
-                else if(open < closed)
-                {
-                    if(!class3Open)
-                    {
-                        logWindow += "class3 opened at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class3Open = true;
-                }
-                else
-                {
-                    if(class3Open)
-                    {
-                        logWindow += "class3 closed at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class3Open = false;
-                }
+                logWindow += "Class3 opened at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class3Open = true;
             }
         }
+    }
     if(class4OK)
+    {
+        int class4Index = hyperText.indexOf(ui->ClassEdit_4->text());
+        if(class4Index == -1)
         {
-            int class4Index = hyperText.indexOf(ui->ClassEdit_4->text());
-            if(class4Index == -1)
+            ui->ClassEdit_4->setText("Class not found");
+            logWindow += "Class 4 not found on page.\n";
+            class4OK = 0;
+        }
+        else
+        {
+            int open = hyperText.indexOf("Open", class4Index);
+            int closed = hyperText.indexOf("Closed", class4Index);
+            if((open == -1 || open > closed) && class4Open)
             {
-                ui->ClassEdit_4->setText("Class not found");
-                logWindow += "Class 4 not found on page.\n";
-                class4OK = 0;
+                logWindow += "Class4 closed at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class4Open = false;
             }
-            else
+            else if((closed == -1 || open < closed) && !class4Open)
             {
-                int open = hyperText.indexOf("Open", class4Index);
-                int closed = hyperText.indexOf("Closed", class4Index);
-                if(open == -1 || closed == -1)
-                {
-                    if(open != -1)
-                    {
-                        if(class4Open)
-                        {
-                            logWindow += "class4 closed at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class4Open = false;
-                    }
-                    else
-                    {
-                        if(!class4Open)
-                        {
-                            logWindow += "class4 opened at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class4Open = true;
-                    }
-                }
-                else if(open < closed)
-                {
-                    if(!class4Open)
-                    {
-                        logWindow += "class4 opened at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class4Open = true;
-                }
-                else
-                {
-                    if(class4Open)
-                    {
-                        logWindow += "class4 closed at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class4Open = false;
-                }
+                logWindow += "Class4 opened at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class4Open = true;
             }
         }
+    }
     if(class5OK)
+    {
+        int class5Index = hyperText.indexOf(ui->ClassEdit_5->text());
+        if(class5Index == -1)
         {
-            int class5Index = hyperText.indexOf(ui->ClassEdit_5->text());
-            if(class5Index == -1)
+            ui->ClassEdit_5->setText("Class not found");
+            logWindow += "Class 5 not found on page.\n";
+            class5OK = 0;
+        }
+        else
+        {
+            int open = hyperText.indexOf("Open", class5Index);
+            int closed = hyperText.indexOf("Closed", class5Index);
+            if((open == -1 || open > closed) && class5Open)
             {
-                ui->ClassEdit_5->setText("Class not found");
-                logWindow += "Class 5 not found on page.\n";
-                class5OK = 0;
+                logWindow += "Class5 closed at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class5Open = false;
             }
-            else
+            else if((closed == -1 || open < closed) && !class5Open)
             {
-                int open = hyperText.indexOf("Open", class5Index);
-                int closed = hyperText.indexOf("Closed", class5Index);
-                if(open == -1 || closed == -1)
-                {
-                    if(open != -1)
-                    {
-                        if(class5Open)
-                        {
-                            logWindow += "class5 closed at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class5Open = false;
-                    }
-                    else
-                    {
-                        if(!class5Open)
-                        {
-                            logWindow += "class5 opened at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class5Open = true;
-                    }
-                }
-                else if(open < closed)
-                {
-                    if(!class5Open)
-                    {
-                        logWindow += "class5 opened at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class5Open = true;
-                }
-                else
-                {
-                    if(class5Open)
-                    {
-                        logWindow += "class5 closed at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class5Open = false;
-                }
+                logWindow += "Class5 opened at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class5Open = true;
             }
         }
+    }
     if(class6OK)
+    {
+        int class6Index = hyperText.indexOf(ui->ClassEdit_6->text());
+        if(class6Index == -1)
         {
-            int class6Index = hyperText.indexOf(ui->ClassEdit_6->text());
-            if(class6Index == -1)
+            ui->ClassEdit_6->setText("Class not found");
+            logWindow += "Class 6 not found on page.\n";
+            class6OK = 0;
+        }
+        else
+        {
+            int open = hyperText.indexOf("Open", class6Index);
+            int closed = hyperText.indexOf("Closed", class6Index);
+            if((open == -1 || open > closed) && class6Open)
             {
-                ui->ClassEdit_6->setText("Class not found");
-                logWindow += "Class 6 not found on page.\n";
-                class6OK = 0;
+                logWindow += "Class6 closed at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class6Open = false;
             }
-            else
+            else if((closed == -1 || open < closed) && !class6Open)
             {
-                int open = hyperText.indexOf("Open", class6Index);
-                int closed = hyperText.indexOf("Closed", class6Index);
-                if(open == -1 || closed == -1)
-                {
-                    if(open != -1)
-                    {
-                        if(class6Open)
-                        {
-                            logWindow += "class6 closed at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class6Open = false;
-                    }
-                    else
-                    {
-                        if(!class6Open)
-                        {
-                            logWindow += "class6 opened at ";
-                            logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                            logWindow += ".\n";
-                        }
-                        class6Open = true;
-                    }
-                }
-                else if(open < closed)
-                {
-                    if(!class6Open)
-                    {
-                        logWindow += "class6 opened at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class6Open = true;
-                }
-                else
-                {
-                    if(class6Open)
-                    {
-                        logWindow += "class6 closed at ";
-                        logWindow += time.toString(Qt::ISODate);
-                        logWindow += " ";
-                        logWindow += time.toString(Qt::TextDate);
-                        logWindow += ".\n";
-                    }
-                    class6Open = false;
-                }
+                logWindow += "Class6 opened at ";
+                QTime time = time.currentTime();
+                QDateTime date = date.currentDateTime();
+                logWindow += date.toString("ddd MMM d yyyy h:mm AP");
+                logWindow += "\n";
+                class6Open = true;
             }
         }
+    }
     updateStats();
     checkWebpageLoop();
 }
